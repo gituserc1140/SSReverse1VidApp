@@ -8,7 +8,8 @@ let currentPlan;
 function showPlan(plan) {
   currentPlan = plan;
   result.classList.remove('empty');
-  result.innerHTML = `<p class="eyebrow">AGENT PLAN · ${plan.template.toUpperCase()}</p><h2 class="plan-title">${escapeHtml(plan.title)}</h2>
+  result.innerHTML = `<p class="eyebrow">AGENT PLAN · ${escapeHtml(plan.template).toUpperCase()}</p><h2 class="plan-title">${escapeHtml(plan.title)}</h2>
+    ${plan.summary ? `<p class="summary">${escapeHtml(plan.summary)}</p>` : ''}
     ${plan.scenes.map(scene => `<div class="scene"><i class="swatch" style="background:${scene.color}"></i><span>${escapeHtml(scene.text)}</span><span>${scene.duration}s</span></div>`).join('')}
     <div class="cost"><b>Estimated cost: ${plan.estimatedCredits} credit${plan.estimatedCredits === 1 ? '' : 's'}</b><br><small>${plan.duration}s HD render estimate; actual usage depends on your Shotstack plan.</small></div>
     <button class="render" id="render">Render this video →</button><div id="status" class="status"></div>`;
@@ -41,5 +42,7 @@ async function poll(id, status) {
   if (body.status === 'done') complete(body); else if (body.status === 'failed') status.textContent = 'Shotstack could not render this video.'; else setTimeout(() => poll(id, status), 4000);
 }
 function complete(body) { document.querySelector('#status').innerHTML = 'Your video is ready.'; const link = document.createElement('a'); link.className = 'download'; link.href = body.url; link.target = '_blank'; link.textContent = 'Watch or download video →'; document.querySelector('#status').append(link); }
-function escapeHtml(value) { return value.replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char])); }
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
+}
 planButton.onclick = plan;
